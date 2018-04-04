@@ -1,5 +1,7 @@
 package fr.wildcodeschool.roomreservation;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ListView;
@@ -25,6 +27,32 @@ public class RoomListActivity extends AppCompatActivity {
 
         // TODO : load rooms from database
 
+        DbHelper mDbHelper = new DbHelper(RoomListActivity.this);
+        SQLiteDatabase db = mDbHelper.getReadableDatabase();
+
+        String[] projection = {
+                DBContract.RoomEntry._ID,
+                DBContract.RoomEntry.COLUMN_NAME_NAME,
+        };
+
+
+        Cursor cursor = db.query(
+                DBContract.RoomEntry.TABLE_NAMES,
+                projection,
+                null, null, null, null, null
+        );
+
+        while (cursor.moveToNext()) {
+            long id = cursor.getLong(cursor.getColumnIndexOrThrow(DBContract.RoomEntry._ID));
+            String name = cursor.getString(cursor.getColumnIndexOrThrow(DBContract.RoomEntry.COLUMN_NAME_NAME));
+
+
+            RoomModel roomModel = new RoomModel(id, name);
+            roomModels.add(roomModel);
+        }
+        cursor.close();
+
         return roomModels;
+
     }
 }
